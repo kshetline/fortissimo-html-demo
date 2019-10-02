@@ -1,0 +1,47 @@
+<div [innerHTML]="banner"></div>
+
+<ks-shrink-wrap minScale="84%">
+  <div class="details">
+    <p-fieldset legend="Detailed settings" [toggleable]="true" [(collapsed)]="detailsCollapsed">
+      <div class="boolean-options">
+        <p-checkbox binary="true" label="colorize"
+            [(ngModel)]="prefs.colorize" (onChange)="onChange()"></p-checkbox>
+        <p-checkbox binary="true" label="darkMode"
+            [(ngModel)]="prefs.darkMode"></p-checkbox>
+        <p-checkbox binary="true" label="showWhitespace"
+            [(ngModel)]="prefs.showWhitespace" (onChange)="onChange()"></p-checkbox>
+       </div>
+    </p-fieldset>
+  </div>
+</ks-shrink-wrap>
+
+<div class="row panels">
+  <div class="col panel">
+    <h3>Source</h3>
+    <div class="icons">
+      <!--suppress AngularUndefinedBinding -->
+      <i class="fas fa-info-circle info" tooltipPosition="bottom" tooltipEvent="hover"
+          [pTooltip]="inputInfo" [escape]="false" tooltipStyleClass="tooltip"
+          (touchstart)="touchToHover($event)"></i>
+      <i class="fas fa-trash" [class.faded]="!source" (click)="clearSource()"></i>
+    </div>
+    <textarea pInputTextarea
+        title="Source"
+        [(ngModel)]="source"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        class="code"
+        rows="40"
+        spellcheck="false"
+        (input)="onChange(true)"></textarea>
+  </div>
+
+  <div class="col panel">
+    <h3>Reparsed</h3>
+    <div title="Reparsed"
+        [innerHTML]="output"
+        [ngClass]="{'dark-mode': prefs.darkMode, 'light-mode': !prefs.darkMode}"
+        class="code html-output"></div>
+  </div>
+</div>
