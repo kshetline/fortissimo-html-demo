@@ -5,6 +5,7 @@ export interface Preferences {
   colorize?: boolean;
   darkMode?: boolean;
   detailsCollapsed?: boolean;
+  reformat?: boolean;
   showWhitespace?: boolean;
   source?: string;
 }
@@ -13,6 +14,7 @@ export const DEFAULT_PREFERENCES = {
   colorize: true,
   darkMode: true,
   detailsCollapsed: false,
+  reformat: false,
   showWhitespace: false,
   source: ''
 };
@@ -31,7 +33,7 @@ export class PreferencesService {
         this.prefs = JSON.parse(prefsStr);
 
         if (!this.prefs || (typeof this.prefs !== 'object'))
-          this.prefs = undefined;
+          this.prefs = DEFAULT_PREFERENCES;
       }
       catch (err) {}
     }
@@ -42,7 +44,7 @@ export class PreferencesService {
   }
 
   set(newPrefs: Preferences): void {
-    this.prefs = newPrefs && cloneDeep(newPrefs);
+    this.prefs = newPrefs && cloneDeep(newPrefs) || DEFAULT_PREFERENCES;
     this.debouncedSaveSettings();
   }
 }

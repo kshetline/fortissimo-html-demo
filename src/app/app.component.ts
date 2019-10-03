@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { HtmlParser, stylizeHtml } from 'fortissimo-html';
+import { addCopyListener, formatHtml, HtmlParser, stylizeHtml } from 'fortissimo-html';
 // import { isEqual } from 'lodash';
 // import { MenuItem } from 'primeng/api';
 
@@ -35,6 +35,7 @@ export class AppComponent implements OnDestroy, OnInit {
   // ];
 
   banner: SafeHtml;
+  endsInNewLine = false;
   inputInfo = '(tbd)';
   output: SafeHtml | string = '';
   prefs: Preferences;
@@ -52,7 +53,7 @@ export class AppComponent implements OnDestroy, OnInit {
   constructor(
     private http: HttpClient,
     private prefsService: PreferencesService,
-    private sanitizer: DomSanitizer,
+    private sanitizer: DomSanitizer
   ) {
     http.get('assets/banner.html', { responseType: 'text' })
       .subscribe(content => this.banner = sanitizer.bypassSecurityTrustHtml(content.toString()));
@@ -101,25 +102,54 @@ export class AppComponent implements OnDestroy, OnInit {
     if (updateThePrefs)
       this.updatePrefs();
 
+    this.endsInNewLine = /[\r\n]$/.test(this.source);
+
     const parser = new HtmlParser();
     const dom = parser.parse(this.source).domRoot;
-    const styled = stylizeHtml(dom, {
-      dark: this.prefs.darkMode,
-      outerTag: 'div',
-      showWhitespace: this.prefs.showWhitespace
-    });
-    this.output = this.sanitizer.bypassSecurityTrustHtml(styled);
+
+    if (this.prefs.reformat)
+      formatHtml(dom);
+
+    if (this.prefs.colorize) {
+      const styled = stylizeHtml(dom, {
+        dark: this.prefs.darkMode,
+        outerTag: 'div',
+        showWhitespace: this.prefs.showWhitespace
+      });
+      this.output = this.sanitizer.bypassSecurityTrustHtml(styled);
+
+      if (this.prefs.showWhitespace)
+        setTimeout(addCopyListener);
+    }
+    else
+      this.output = dom.toString();
   }
 
-  private reparse(delayError = false): void {
+  onPaste(event: ClipboardEvent): void {
+    const paste = (event.clipboardData || (window as any).clipboardData).getData('text');
+
+    if (/^http(s?):\/\/.+/i.test(paste)) {
+      event.preventDefault();
+
+      const script = document.createElement('script');
+
+      // script.setAttribute('type', 'text/html');
+
+      script.onload = () => {
+        this.source = script.innerHTML;
+        document.head.removeChild(script);
+      };
+
+      script.onerror = () => {
+        document.head.removeChild(script);
+      };
+
+      script.src = paste;
+      document.head.appendChild(script);
+    }
   }
 
-  private updatePrefs(): void {
-    const prefs = {
-      detailsCollapsed: this.detailsCollapsed,
-      source: this.source,
-    };
-
-    this.prefsService.set(prefs);
+  updatePrefs(): void {
+    this.prefsService.set(this.prefs);
   }
 }

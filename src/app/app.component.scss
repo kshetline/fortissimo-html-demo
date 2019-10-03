@@ -62,13 +62,16 @@ h3 {
 }
 
 .panels {
+  align-items: stretch;
+  display: flex;
   margin-top: 1em;
 }
 
 .panel {
   margin-bottom: 2em;
-  min-width: 328px;
+  min-width: 400px;
   position: relative;
+  width: calc(50% - 0.5em);
 
   p-dropdown {
     margin-right: 0.25em;
@@ -76,6 +79,13 @@ h3 {
     &.input-options ::ng-deep .ui-dropdown {
       min-width: 11em;
     }
+  }
+}
+
+.source {
+  textarea {
+    line-height: 14px;
+    height: calc(100% - 4.6em);
   }
 }
 
@@ -137,7 +147,8 @@ h3 {
 .code,
 .html-output {
   display: inline-block;
-  font: 14px "Roboto Mono", "Courier New", monospace;
+  font: 12px Menlo, "Courier New", monospace;
+  line-height: 14px;
   margin-right: 1em;
   resize: none;
   width: calc(100% - 1em);
@@ -146,7 +157,12 @@ h3 {
 .html-output {
   border: solid 1px gray;
   min-height: 20em;
+  overflow: auto;
   padding: 0.429em;
+
+  &.new-line {
+    padding-bottom: calc(0.429em + 14px);
+  }
 }
 
 .error {
@@ -156,12 +172,6 @@ h3 {
 @media screen and (max-width: 480px) {
   .panel {
     min-width: calc(100% - 2em);
-  }
-}
-
-@media (max-device-width: 480px), (max-device-height: 480px), (pointer: coarse), (pointer: none) {
-  p-button.log-button {
-    display: none;
   }
 }
 
