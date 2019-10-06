@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { addCopyListener, formatHtml, HtmlParser, stylizeHtml } from 'fortissimo-html';
+import { addCopyListener, formatHtml, HtmlParser, stylizeHtml, ValueQuoteStyle, ValueQuoting } from 'fortissimo-html';
 // import { isEqual } from 'lodash';
 // import { MenuItem } from 'primeng/api';
 
@@ -18,6 +18,7 @@ function screenTooSmallForTooltip(): boolean {
 })
 export class AppComponent implements OnDestroy, OnInit {
   private _detailsCollapsed = false;
+  private _indent = '0';
   private needsMouseLeave: HTMLElement;
 
   private clickListener = () => {
@@ -27,15 +28,23 @@ export class AppComponent implements OnDestroy, OnInit {
     }
   };
 
-  // quoteOptions = [
-  //   { label: 'DOUBLE', value: Quote.DOUBLE },
-  //   { label: 'SINGLE', value: Quote.SINGLE },
-  //   { label: 'PREFER_DOUBLE', value: Quote.PREFER_DOUBLE },
-  //   { label: 'PREFER_SINGLE', value: Quote.PREFER_SINGLE }
-  // ];
+  quoting = [
+    { label: 'LEAVE_AS_IS', value: ValueQuoting.LEAVE_AS_IS },
+    { label: 'ALWAYS_QUOTE', value: ValueQuoting.ALWAYS_QUOTE },
+    { label: 'UNQUOTE_INTEGERS', value: ValueQuoting.UNQUOTE_INTEGERS },
+    { label: 'UNQUOTE_SIMPLE_VALUES', value: ValueQuoting.UNQUOTE_SIMPLE_VALUES }
+  ];
+
+  quoteStyle = [
+    { label: 'PREFER_DOUBLE', value: ValueQuoteStyle.PREFER_DOUBLE },
+    { label: 'PREFER_SINGLE', value: ValueQuoteStyle.PREFER_SINGLE },
+    { label: 'DOUBLE', value: ValueQuoteStyle.DOUBLE },
+    { label: 'SINGLE', value: ValueQuoteStyle.SINGLE }
+  ];
 
   banner: SafeHtml;
   endsInNewLine = false;
+  indentError = false;
   inputInfo = '(tbd)';
   output: SafeHtml | string = '';
   prefs: Preferences;
@@ -48,6 +57,21 @@ export class AppComponent implements OnDestroy, OnInit {
       this._detailsCollapsed = newValue;
       this.updatePrefs();
     }
+  }
+
+  get indent(): string { return this._indent; }
+  set indent(newValue: string) {
+    if (this._indent !== newValue)
+      this._indent = newValue;
+
+    const value = newValue ? Number(newValue) : 0;
+
+    if (0 <= value && value <= 10) {
+      this.prefs.indent = value;
+      this.indentError = false;
+    }
+    else
+      this.indentError = true;
   }
 
   constructor(
@@ -66,6 +90,7 @@ export class AppComponent implements OnDestroy, OnInit {
     });
 
     this._detailsCollapsed = !!this.prefs.detailsCollapsed;
+    this._indent = (this.prefs.indent || 0).toString();
     this.source = this.prefs.source || '';
   }
 
@@ -102,27 +127,33 @@ export class AppComponent implements OnDestroy, OnInit {
     if (updateThePrefs)
       this.updatePrefs();
 
-    this.endsInNewLine = /[\r\n]$/.test(this.source);
-
     const parser = new HtmlParser();
     const dom = parser.parse(this.source).domRoot;
 
     if (this.prefs.reformat)
-      formatHtml(dom);
+      formatHtml(dom, {
+        indent: this.prefs.indent,
+        valueQuoteStyle: this.prefs.quoteStyle,
+        valueQuoting: this.prefs.quoting
+      });
 
     if (this.prefs.colorize) {
       const styled = stylizeHtml(dom, {
         dark: this.prefs.darkMode,
+        includeCopyScript: false,
         outerTag: 'div',
         showWhitespace: this.prefs.showWhitespace
       });
       this.output = this.sanitizer.bypassSecurityTrustHtml(styled);
+      this.endsInNewLine = /[\r\n]<\/span><\/div>$/.test(styled);
 
       if (this.prefs.showWhitespace)
         setTimeout(addCopyListener);
     }
-    else
+    else {
       this.output = dom.toString();
+      this.endsInNewLine = /[\r\n]$/.test(this.output as string);
+    }
   }
 
   onPaste(event: ClipboardEvent): void {

@@ -1,22 +1,31 @@
 import { Injectable } from '@angular/core';
+import { ValueQuoteStyle, ValueQuoting } from 'fortissimo-html';
 import { cloneDeep, debounce } from 'lodash';
 
 export interface Preferences {
   colorize?: boolean;
+  continuationIndent?: number;
   darkMode?: boolean;
   detailsCollapsed?: boolean;
+  indent?: number;
   reformat?: boolean;
   showWhitespace?: boolean;
   source?: string;
+  quoteStyle?: ValueQuoteStyle;
+  quoting?: ValueQuoting;
+  tabSize?: 8;
 }
 
 export const DEFAULT_PREFERENCES = {
   colorize: true,
   darkMode: true,
   detailsCollapsed: false,
+  indent: 0,
   reformat: false,
   showWhitespace: false,
-  source: ''
+  source: '',
+  quoteStyle: ValueQuoteStyle.PREFER_DOUBLE,
+  quoting: ValueQuoting.LEAVE_AS_IS
 };
 
 @Injectable()

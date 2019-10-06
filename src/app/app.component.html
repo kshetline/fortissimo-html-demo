@@ -14,6 +14,34 @@
             [disabled]="!prefs.colorize"
             [(ngModel)]="prefs.showWhitespace" (onChange)="onChange()"></p-checkbox>
        </div>
+
+        <span class="labeled-dropdown">
+          <label>valueQuoting:</label>
+          <p-dropdown [options]="quoting" placeholder="quoting"
+              [disabled]="!prefs.reformat"
+              [(ngModel)]="prefs.quoting" (onChange)="onChange()"></p-dropdown>
+        </span>
+
+        <span class="labeled-dropdown">
+          <label>valueQuoteStyle:</label>
+          <p-dropdown [options]="quoteStyle" placeholder="quoteStyle"
+              [disabled]="!prefs.reformat || !prefs.quoting"
+              [(ngModel)]="prefs.quoteStyle" (onChange)="onChange()"></p-dropdown>
+        </span>
+
+        <span class="labeled-input">
+          <label for="indent">indent:</label>
+          <input id="indent"
+              pInputText
+              [class.error]="indentError && prefs.reformat"
+              [disabled]="!prefs.reformat"
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              [(ngModel)]="indent"
+              (input)="onChange()">
+        </span>
     </p-fieldset>
   </div>
 </ks-shrink-wrap>
@@ -43,13 +71,13 @@
 
   <div class="col panel">
     <h3>Reparsed</h3>
-    <div *ngIf="prefs.colorize" title="Reparsed"
+    <div *ngIf="prefs.colorize"
         [innerHTML]="output"
         [ngClass]="{'dark-mode': prefs.darkMode, 'light-mode': !prefs.darkMode, 'new-line': endsInNewLine}"
         class="code html-output"></div>
-    <div *ngIf="!prefs.colorize" title="Reparsed"
+    <div *ngIf="!prefs.colorize"
         [innerText]="output"
-        [ngClass]="{'dark-mode': prefs.darkMode, 'light-mode': !prefs.darkMode}"
+        [ngClass]="{'dark-mode': prefs.darkMode, 'light-mode': !prefs.darkMode, 'new-line': endsInNewLine}"
         class="code html-output"></div>
   </div>
 </div>
