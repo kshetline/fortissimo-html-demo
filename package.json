@@ -22,7 +22,7 @@
     "@angular/router": "^8.2.1",
     "@fortawesome/fontawesome-free": "^5.10.1",
     "detect-resize": "^0.1.5",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "primeicons": "^2.0.0",
     "primeng": "^8.0.2",
     "rxjs": "~6.4.0",
