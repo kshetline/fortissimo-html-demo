@@ -124,15 +124,19 @@ export class AppComponent implements OnDestroy, OnInit {
   }
 
   onChange(delayError = false, updateThePrefs = true): void {
-    if (updateThePrefs)
+    if (updateThePrefs) {
+      this.prefs.source = this.source;
       this.updatePrefs();
+    }
 
     const parser = new HtmlParser();
     const dom = parser.parse(this.source).domRoot;
 
     if (this.prefs.reformat)
       formatHtml(dom, {
+        endDocumentWithNewline: true,
         indent: this.prefs.indent,
+        trimDocument: true,
         valueQuoteStyle: this.prefs.quoteStyle,
         valueQuoting: this.prefs.quoting
       });
@@ -145,7 +149,7 @@ export class AppComponent implements OnDestroy, OnInit {
         showWhitespace: this.prefs.showWhitespace
       });
       this.output = this.sanitizer.bypassSecurityTrustHtml(styled);
-      this.endsInNewLine = /[\r\n]<\/span><\/div>$/.test(styled);
+      this.endsInNewLine = /([\r\n]<\/span>|<\/span>[\r\n]+)<\/div>$/.test(styled);
 
       if (this.prefs.showWhitespace)
         setTimeout(addCopyListener);

@@ -20,6 +20,7 @@ export const DEFAULT_PREFERENCES = {
   colorize: true,
   darkMode: true,
   detailsCollapsed: false,
+  endDocumentWithNewline: true,
   indent: 0,
   reformat: false,
   showWhitespace: false,
