@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { SharedModule } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
@@ -13,7 +14,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule} from 'primeng/inputtextarea';
 import { MenuModule } from 'primeng/menu';
 import { RadioButtonModule } from 'primeng/radiobutton';
-import { SharedModule } from 'primeng/shared';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { AppComponent } from './app.component';
