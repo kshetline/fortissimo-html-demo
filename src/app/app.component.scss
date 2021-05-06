@@ -32,6 +32,14 @@ h3 {
   min-width: calc(320px - 1em);
   padding-top: 5px;
   width: calc(100% - 1em);
+
+  ::ng-deep .p-dropdown {
+    margin-right: 0.5em;
+
+    &.input-options ::ng-deep .ui-dropdown {
+      min-width: 11em;
+    }
+  }
 }
 
 .boolean-options {
